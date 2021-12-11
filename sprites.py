@@ -1,5 +1,5 @@
 import typing
-
+from column import Column
 import pygame
 from consts import Tile_side
 
@@ -132,5 +132,30 @@ class Player(pygame.sprite.Sprite):
                 y_dif = y_dif_till_collision
             else:
                 y_dif = 0
-        print(x_dif, y_dif)
         return x_dif, y_dif
+
+
+class LavelChanger(Tile):
+    def __init__(self,
+                 x: int, y: int,
+                 texture: pygame.Surface,
+                 layer_of_tile_group: pygame.sprite.Group,
+                 tile_group: pygame.sprite.Group,
+                 transparency: str,
+                 size: tuple,
+                 player: Player,
+                 lavels: Column,
+                 direction: typing.Union["d", "u"]) -> None:
+        super(LavelChanger, self).__init__(x, y, texture, layer_of_tile_group, tile_group, transparency, size)
+        self.player = player
+        self.lavels = lavels
+        self.direction = direction
+
+    def update(self, x: int, y: int) -> None:
+        super(LavelChanger, self).update(x, y)
+        if pygame.sprite.collide_rect(self, self.player):
+            if self.direction == "d":
+                self.lavels.down()
+            elif self.direction == "u":
+                self.lavels.up()
+

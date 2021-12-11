@@ -22,13 +22,14 @@ def main():
 
     clock = pygame.time.Clock()
 
-    lavels = init_lavels()
-
     player_group = pygame.sprite.Group()
     player_anims = AnimCount(Player_animlength, Player_left_walk, Player_right_walk, Player_stand)
     player = Player(Player_x, Player_y, Player_speed, Player_vision_range, player_anims, player_group)
 
+    lavels = init_lavels(player)
+
     run = True
+    pressed = False
 
     while run:
         clock.tick(60)
@@ -38,13 +39,23 @@ def main():
 
         keys = pygame.key.get_pressed()
         if keys[pygame.K_1]:
-            lavels.down()
-        if keys[pygame.K_2]:
-            lavels.up()
-        if keys[pygame.K_UP]:
-            player.speed += 1
-        if keys[pygame.K_DOWN]:
-            player.speed -= 1
+            if not pressed:
+                lavels.down()
+                pressed = True
+        elif keys[pygame.K_2]:
+            if not pressed:
+                lavels.up()
+                pressed = True
+        elif keys[pygame.K_UP]:
+            if not pressed:
+                player.speed += 1
+                pressed = True
+        elif keys[pygame.K_DOWN]:
+            if not pressed:
+                player.speed -= 1
+                pressed = True
+        else:
+            pressed = False
 
         draw(screen, lavels, player)
         pygame.display.flip()

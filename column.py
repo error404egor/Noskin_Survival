@@ -17,3 +17,6 @@ class Column:
             return self.__array[self.__index_now]
         except IndexError:
             raise Exception("There are 0 objects in column.")
+
+    def __str__(self):
+        return str(self.__array) + ", " + str(self.__index_now)
