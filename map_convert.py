@@ -2,6 +2,7 @@ import pygame
 from consts import Tiles_dict, Tile_side, Screen_width, Screen_height
 from sprites import Tile, Lavel
 import os
+from column import Column
 
 
 def load_layer_as_list(file: str) -> list:
@@ -34,8 +35,8 @@ def load_layer(layer_map: list,
     layers.append(group_of_this_layer)
 
 
-def init_lavels() -> list[Lavel, ...]:
-    lavels = []
+def init_lavels() -> Column:
+    lavels = Column()
     for lavel in os.listdir("./maps"):
         layers = []
         tiles_types_and_groups = {"0": pygame.sprite.Group(), "1": pygame.sprite.Group()}

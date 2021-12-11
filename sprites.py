@@ -1,3 +1,5 @@
+import typing
+
 import pygame
 from consts import Tile_side
 
@@ -71,7 +73,7 @@ class Player(pygame.sprite.Sprite):
         self.vision_range = vision_range
         player_group.add(self)
 
-    def update(self, opaque_tiles_group: pygame.sprite.Group):
+    def update(self, opaque_tiles_group: pygame.sprite.Group) -> typing.Tuple[int, int]:
         x_dif, y_dif = 0, 0
         keys = pygame.key.get_pressed()
         if keys[pygame.K_w]:
