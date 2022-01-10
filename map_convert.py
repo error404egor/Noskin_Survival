@@ -5,6 +5,11 @@ import os
 from column import Column
 
 
+class Setting:
+    def __init__(self, obj) -> None:
+        self.obj = obj
+
+
 def load_layer_as_list(file: str) -> list:
     with open(file, "r") as map_:
         level_map = []
@@ -35,6 +40,8 @@ def load_layer(layer_map: list,
                              player,
                              column,
                              tile)
+            elif tile == "@":
+                pass
             else:
                 Tile(x_now, y_now,
                      Tiles_dict[tile]["texture"],

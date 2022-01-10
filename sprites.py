@@ -1,7 +1,7 @@
 import typing
 from column import Column
 import pygame
-from consts import Tile_side
+from consts import Tile_side, Player_x, Player_y, Screen_width, Screen_height
 
 
 class Lavel:
@@ -10,6 +10,8 @@ class Lavel:
                  visible_tiles_types_and_groups: {"0": pygame.sprite.Group, "1": pygame.sprite.Group}):
         self.layers = layers
         self.visible_tiles_types_and_groups = visible_tiles_types_and_groups
+        self.spawn_x = self.spawn_x_st = Player_x
+        self.spawn_y = self.spawn_y_st = Player_y
 
     def update(self,
                dif_x: int, dif_y: int):
@@ -20,6 +22,22 @@ class Lavel:
              screen: pygame.Surface):
         for layer in self.layers:
             layer.draw(screen)
+
+    def set_spawn(self, x: int, y: int):
+        self.spawn_x = x
+        self.spawn_y = y
+
+    def move_to_spawn(self, x, y):
+        left, top = self.layers[0].sprites()[0].rect.topleft
+        right, bottom = self.layers[0].sprites()[-1].rect.bottomright
+        left_st, top_st = (Screen_width - right + left) // 2, (Screen_width - bottom + top) // 2
+        tomove_x = left_st - left + (self.spawn_x - self.spawn_x_st)
+        tomove_y = top_st - top + (self.spawn_y - self.spawn_y_st)
+        self.update(tomove_x, tomove_y)
+
+
+
+
 
 
 class Tile(pygame.sprite.Sprite):
