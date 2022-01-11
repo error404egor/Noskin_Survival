@@ -7,20 +7,23 @@ Screen_width = 1000
 Screen_height = 700
 Screen_size = (Screen_width, Screen_height)
 
-Player_width = 96
-Player_height = 96
-Player_x = Screen_width // 2
-Player_y = Screen_height // 2
-Player_speed = 5
-Player_fpu = 1
-Player_vision_range = 300
-Player_side = 90
+#  Player_width = 96   todo cut down
+#  Player_height = 96   todo cut down
+Player_x = Screen_width // 2  # место спавна игрока (x)
+Player_y = Screen_height // 2  # место спавна игрока (y)
+Player_speed = 5  # скорость игрока за кадр/пиксель
+#  Player_fpu = 1   todo cut down
+Player_vision_range = 300  # радиус круга вокруг игрока
+Player_side = 85  # сторона игрока при его движении
 Player_right_walk = [pygame.transform.scale(pygame.image.load(os.path.join("./textures/Walk Right", i)),
-                     (Player_side, Player_side, )) for i in os.listdir("./textures/Walk Right")]
+                     (Player_side, Player_side, )) for i in os.listdir("./textures/Walk Right")]  # список картинок
+# анимации объектов, трансормированный по длине player_side для анимации правого бега
 Player_left_walk = [pygame.transform.scale(pygame.image.load(os.path.join("./textures/Walk Left", i)),
-                    (Player_side, Player_side, )) for i in os.listdir("./textures/Walk Left")]
-Player_animlength = len(Player_right_walk)
-Player_stand = pygame.transform.scale(pygame.image.load("./textures/idle.png"), (Player_side, Player_side, ))
+                    (Player_side, Player_side, )) for i in os.listdir("./textures/Walk Left")]  # список картинок
+# анимации объектов, трансормированный по длине player_side для анимации левого бега
+Player_animlength = len(Player_right_walk)  # длина анимации (количество картинок анимации)
+Player_stand = pygame.transform.scale(pygame.image.load("./textures/idle.png"), (Player_side, Player_side, ))  #картин
+# ка стоящего амонгуса
 
 with open("tiles.csv", "r") as tiles:
     Tiles_list = list(csv.DictReader(tiles))
@@ -30,6 +33,8 @@ with open("tiles.csv", "r") as tiles:
                                  "size": (int(elem["width"]),
                                           int(elem["height"]))} for elem in Tiles_list}
 
-Tile_side = Tiles_dict[" "]["size"][0]
+# из таблицы tiles.csv создан пригодный для программы словарь
 
-Level0 = "map.txt"
+Tile_side = Tiles_dict[" "]["size"][0]  # размеры тайла(эталонные)
+
+#  Level0 = "map.txt" todo to cut down one more shit

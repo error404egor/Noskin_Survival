@@ -36,10 +36,6 @@ class Lavel:
         self.update(tomove_x, tomove_y)
 
 
-
-
-
-
 class Tile(pygame.sprite.Sprite):
     def __init__(self,
                  x: int, y: int,
