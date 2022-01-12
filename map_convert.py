@@ -1,13 +1,8 @@
 import pygame
-from consts import Tiles_dict, Tile_side, Screen_width, Screen_height
+from consts import Tiles_dict, Tile_side, Screen_width, Screen_height, Player_x, Player_y
 from sprites import Tile, Lavel, LavelChanger
 import os
 from column import Column
-
-
-class Setting:
-    def __init__(self, obj) -> None:
-        self.obj = obj
 
 
 def load_layer_as_list(file: str) -> list:
@@ -25,12 +20,14 @@ def load_layer(layer_map: list,
     startpos_x = (Screen_width - len(layer_map[0]) * Tile_side) // 2
     y_now = (Screen_height - len(layer_map) * Tile_side) // 2
     group_of_this_layer = pygame.sprite.Group()
+    standart_y_stdif = 0
+    standart_x_stdif = 0
     for line in layer_map:
         x_now = startpos_x
         for tile in line:
             if tile == "-":
                 pass
-            elif tile == "d" or "u":
+            elif tile == "d" or tile == "u":
                 LavelChanger(x_now, y_now,
                              Tiles_dict[tile]["texture"],
                              group_of_this_layer,
@@ -40,8 +37,15 @@ def load_layer(layer_map: list,
                              player,
                              column,
                              tile)
-            elif tile == "@":
-                pass
+            elif tile == "s":
+                standart_x_stdif = (x_now + Tile_side // 2) - Player_x
+                standart_y_stdif = (y_now + Tile_side // 2) - Player_y
+                Tile(x_now, y_now,
+                     Tiles_dict[tile]["texture"],
+                     group_of_this_layer,
+                     tiles_types_and_groups[Tiles_dict[tile]["transparency"]],
+                     Tiles_dict[tile]["transparency"],
+                     Tiles_dict[tile]["size"])
             else:
                 Tile(x_now, y_now,
                      Tiles_dict[tile]["texture"],
@@ -52,15 +56,24 @@ def load_layer(layer_map: list,
             x_now += Tile_side
         y_now += Tile_side
     layers.append(group_of_this_layer)
+    return standart_x_stdif, standart_y_stdif
 
 
 def init_lavels(player) -> Column:
     lavels = Column()
     for lavel in os.listdir("./maps"):
+        standart_x_stdif, standart_y_stdif = 0, 0
         layers = []
         tiles_types_and_groups = {"0": pygame.sprite.Group(), "1": pygame.sprite.Group()}
         for layer in os.listdir(os.path.join("./maps", lavel)):
             layer_map = load_layer_as_list(os.path.join("./maps", lavel, layer))
-            load_layer(layer_map, layers, tiles_types_and_groups, player, lavels)
-        lavels.append(Lavel(layers, tiles_types_and_groups))
+            if not(standart_x_stdif or standart_y_stdif):
+                standart_x_stdif, standart_y_stdif = load_layer(layer_map, layers,
+                                                                tiles_types_and_groups, player, lavels)
+            else:
+                load_layer(layer_map, layers, tiles_types_and_groups, player, lavels)
+        newlavel = Lavel(layers, tiles_types_and_groups)
+        newlavel.change_standart_stdif(standart_x_stdif, standart_y_stdif)
+        lavels.append(newlavel)
+
     return lavels

@@ -1,7 +1,8 @@
 char,transparency,texture,width,height
  ,0,./textures/Tiles/wooden_planks.png,100,100
-#,1,./textures/Tiles/bricks.png,100,100
-B,1,./textures/Tiles/bed.png,80,200
-C,1,./textures/Tiles/armchair.png,90,90
+#,0,./textures/Tiles/bricks.png,100,100
+B,0,./textures/Tiles/bed.png,80,200
+C,0,./textures/Tiles/armchair.png,90,90
 u,0,./textures/Tiles/up.jpg,10,10
 d,0,./textures/Tiles/ledder.png,100,100
+s,0,./textures/Tiles/up.jpg,100,100

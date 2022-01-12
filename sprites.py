@@ -14,6 +14,8 @@ class Lavel:
         # коллизионных спрайтов и бесколизионных спрайтов (создание двух групп для них).
         self.y_stdif = 0
         self.x_stdif = 0
+        self.standart_x_stdif = 0
+        self.standart_y_stdif = 0
 
     def update(self,
                dif_x: int, dif_y: int):
@@ -28,9 +30,14 @@ class Lavel:
             layer.draw(screen)  # отрисовка всех слоев карты
 
     def move_to_spawn(self):
+        print(self.x_stdif, self.y_stdif)
         self.update(self.x_stdif, self.y_stdif)
-        self.x_stdif = 0
-        self.y_stdif = 0
+        self.update(self.standart_x_stdif, self.standart_y_stdif)
+
+    def change_standart_stdif(self, x, y):
+        self.standart_x_stdif += x
+        self.standart_y_stdif += y
+        self.update(self.standart_x_stdif, self.standart_y_stdif)
 
 
 class Tile(pygame.sprite.Sprite):
@@ -169,9 +176,9 @@ class LavelChanger(Tile):
         super(LavelChanger, self).update(x, y)
         if pygame.sprite.collide_rect(self, self.player):
             if self.direction == "d":
+                self.lavels.get().move_to_spawn()
                 self.lavels.down()
-                self.lavels.get().move_to_spawn()
             elif self.direction == "u":
-                self.lavels.up()
                 self.lavels.get().move_to_spawn()
+                self.lavels.up()
 
