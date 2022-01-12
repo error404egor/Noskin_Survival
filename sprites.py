@@ -8,26 +8,28 @@ class Lavel:
     def __init__(self,
                  layers: list[pygame.sprite.Group, ...],
                  visible_tiles_types_and_groups: {"0": pygame.sprite.Group, "1": pygame.sprite.Group}):
-        self.layers = layers
-        self.visible_tiles_types_and_groups = visible_tiles_types_and_groups
-        self.spawn_x = self.spawn_x_st = Player_x
-        self.spawn_y = self.spawn_y_st = Player_y
+        self.layers = layers  # слои объектов, которые будут последовательно
+        # отрисовываться на карте, каждый слой - группа спрайтов
+        self.visible_tiles_types_and_groups = visible_tiles_types_and_groups  # определение группы
+        # коллизионных спрайтов и бесколизионных спрайтов (создание двух групп для них).
+        self.spawn_x = self.spawn_x_st = Player_x  # место спавна персонажа (x)
+        self.spawn_y = self.spawn_y_st = Player_y  # место спавна персонажа (y)
 
     def update(self,
                dif_x: int, dif_y: int):
         for layer in self.layers:
-            layer.update(dif_x, dif_y)
+            layer.update(dif_x, dif_y)  # смещение карты относительно пройденного игроком расстояния
 
     def draw(self,
              screen: pygame.Surface):
         for layer in self.layers:
-            layer.draw(screen)
+            layer.draw(screen)  # отрисовка всех слоев карты
 
-    def set_spawn(self, x: int, y: int):
+    def set_spawn(self, x: int, y: int):  # todo nedodelka
         self.spawn_x = x
         self.spawn_y = y
 
-    def move_to_spawn(self, x, y):
+    def move_to_spawn(self, x, y):  # todo nedodelka
         left, top = self.layers[0].sprites()[0].rect.topleft
         right, bottom = self.layers[0].sprites()[-1].rect.bottomright
         left_st, top_st = (Screen_width - right + left) // 2, (Screen_width - bottom + top) // 2
@@ -38,38 +40,41 @@ class Lavel:
 
 class Tile(pygame.sprite.Sprite):
     def __init__(self,
-                 x: int, y: int,
-                 texture: pygame.Surface,
-                 layer_of_tile_group: pygame.sprite.Group,
-                 tile_group: pygame.sprite.Group,
-                 transparency: str,
-                 size: tuple) -> None:
+                 x: int, y: int,  # x, y координаты положения левого верхнего угла тайла
+                 texture: pygame.Surface,  # текстура объектика(картиночка.a4)
+                 layer_of_tile_group: pygame.sprite.Group,  # объектик прикрепляют к группе слоя(аналогия с ожиданием
+                 # попадания в лицей ниу вшэ)
+                 tile_group: pygame.sprite.Group,  # объектик прикрепляют к группе колизии(их 2 штуки с колизией и без)
+                 # (аналогия с хайпиками авангарда и с нехайпиками неавангарда)
+                 transparency: str,  # 0 для бесколлизионных, 1 для коллизионных
+                 size: tuple) -> None:  # размер тайла width, height
         super().__init__()
-        self.image = texture
-        self.rect = pygame.rect.Rect(x + (Tile_side - size[0]) // 2, y + (Tile_side - size[1]) // 2, *size)
-        self.transparency = transparency
-        self.add(layer_of_tile_group, tile_group)
+        self.image = texture  # загрузка картинки спрайта
+        self.rect = pygame.rect.Rect(x + (Tile_side - size[0]) // 2, y + (Tile_side - size[1]) // 2, *size)  # создание
+        # тела тайла и размещение по его центру
+        self.transparency = transparency  # база
+        self.add(layer_of_tile_group, tile_group)  # добавка в группу слоя и тп смотри в небеса
 
     def update(self, x: int, y: int) -> None:
-        self.rect.x -= x
-        self.rect.y -= y
+        self.rect.x -= x  # смещение верхней точки левой (ox) тайла на -x при движении додика вправо, иначе x
+        self.rect.y -= y  # то же самое но уже oy и y
 
 
-class AnimCount:
+class AnimCount:  # забейте тут всякий бред
     def __init__(self, n: int, left_anims: list, right_anims: list, stand_anim: str,
                  count=0, fpu=1, right=True, stand=True) -> None:
-        self.n = n
-        self.count = count % (n * fpu)
-        self.right = right
-        self.stand = stand
-        self.fpu = fpu
-        self.left_anims = left_anims
-        self.right_anims = right_anims
-        self.stand_anim = stand_anim
+        self.n = n  # количество картинок анимации
+        self.count = count % (n * fpu)  # картинка в текущий момент
+        self.right = right  # флаг ходьбы вправо
+        self.stand = stand  # флаг стояния
+        self.fpu = fpu  # скорость смены картинки в условных единицах
+        self.left_anims = left_anims  # анимация левой ходьбы
+        self.right_anims = right_anims  # анимация правой ходьбы
+        self.stand_anim = stand_anim  # анимация стояния (1 картинка)
 
     def get_anim(self) -> pygame.Surface:
         if self.stand:
-            return self.stand_anim
+            return self.stand_anim  # при стоянии возвращает список анимаций стояния и так далее
         elif self.right:
             return self.right_anims[int(self.count // self.fpu)]
         else:
@@ -80,12 +85,12 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, x: int, y: int, speed: int, vision_range: int,
                  anim: AnimCount, player_group: pygame.sprite.Group) -> None:
         super().__init__()
-        self.anim = anim
-        self.image = self.anim.get_anim()
-        self.rect = self.image.get_rect(center=(x, y))
-        self.speed = speed
-        self.vision_range = vision_range
-        player_group.add(self)
+        self.anim = anim  # объект анимации для игрока
+        self.image = self.anim.get_anim()  # запихивание самой первой картинки амогуса в ег self image
+        self.rect = self.image.get_rect(center=(x, y))  # создание границ амогусика
+        self.speed = speed  # скорость амогуса пиксель/кадр
+        self.vision_range = vision_range  # todo in fact
+        player_group.add(self)  # добавка в группу спрайтов игрока
 
     def update(self, opaque_tiles_group: pygame.sprite.Group) -> typing.Tuple[int, int]:
         x_dif, y_dif = 0, 0
