@@ -12,11 +12,13 @@ class Lavel:
         # отрисовываться на карте, каждый слой - группа спрайтов
         self.visible_tiles_types_and_groups = visible_tiles_types_and_groups  # определение группы
         # коллизионных спрайтов и бесколизионных спрайтов (создание двух групп для них).
-        self.spawn_x = self.spawn_x_st = Player_x  # место спавна персонажа (x)
-        self.spawn_y = self.spawn_y_st = Player_y  # место спавна персонажа (y)
+        self.y_stdif = 0
+        self.x_stdif = 0
 
     def update(self,
                dif_x: int, dif_y: int):
+        self.x_stdif -= dif_x
+        self.y_stdif -= dif_y
         for layer in self.layers:
             layer.update(dif_x, dif_y)  # смещение карты относительно пройденного игроком расстояния
 
@@ -25,17 +27,10 @@ class Lavel:
         for layer in self.layers:
             layer.draw(screen)  # отрисовка всех слоев карты
 
-    def set_spawn(self, x: int, y: int):  # todo nedodelka
-        self.spawn_x = x
-        self.spawn_y = y
-
-    def move_to_spawn(self, x, y):  # todo nedodelka
-        left, top = self.layers[0].sprites()[0].rect.topleft
-        right, bottom = self.layers[0].sprites()[-1].rect.bottomright
-        left_st, top_st = (Screen_width - right + left) // 2, (Screen_width - bottom + top) // 2
-        tomove_x = left_st - left + (self.spawn_x - self.spawn_x_st)
-        tomove_y = top_st - top + (self.spawn_y - self.spawn_y_st)
-        self.update(tomove_x, tomove_y)
+    def move_to_spawn(self):
+        self.update(self.x_stdif, self.y_stdif)
+        self.x_stdif = 0
+        self.y_stdif = 0
 
 
 class Tile(pygame.sprite.Sprite):
@@ -175,6 +170,8 @@ class LavelChanger(Tile):
         if pygame.sprite.collide_rect(self, self.player):
             if self.direction == "d":
                 self.lavels.down()
+                self.lavels.get().move_to_spawn()
             elif self.direction == "u":
                 self.lavels.up()
+                self.lavels.get().move_to_spawn()
 
