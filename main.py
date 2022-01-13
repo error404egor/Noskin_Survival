@@ -4,6 +4,7 @@ from consts import Screen_size, Player_animlength, Player_left_walk, Player_righ
 from map_convert import init_lavels
 from sprites import Player, AnimCount
 from column import Column
+#picking keys
 
 
 def draw(screen, lavels: Column, player: Player):
