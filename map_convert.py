@@ -1,6 +1,6 @@
 import pygame
-from consts import Tiles_dict, Tile_side, Screen_width, Screen_height, Player_x, Player_y
-from sprites import Tile, Lavel, LavelChanger
+from consts import Tiles_dict, Tile_side, Screen_width, Screen_height, Player_x, Player_y, Number_of_keys_at_floor
+from sprites import Tile, Lavel, LavelChanger, Keys
 import os
 from column import Column
 
@@ -16,7 +16,7 @@ def load_layer_as_list(file: str) -> list:
 
 def load_layer(layer_map: list,
                layers: list,
-               tiles_types_and_groups: dict, player, column):
+               tiles_types_and_groups: dict, player, column, keys):
     startpos_x = (Screen_width - len(layer_map[0]) * Tile_side) // 2
     y_now = (Screen_height - len(layer_map) * Tile_side) // 2
     group_of_this_layer = pygame.sprite.Group()
@@ -46,6 +46,9 @@ def load_layer(layer_map: list,
                      tiles_types_and_groups[Tiles_dict[tile]["transparency"]],
                      Tiles_dict[tile]["transparency"],
                      Tiles_dict[tile]["size"])
+            elif tile == "k":
+                keys.add_position((x_now, y_now, ))
+                pass
             else:
                 Tile(x_now, y_now,
                      Tiles_dict[tile]["texture"],
@@ -59,20 +62,22 @@ def load_layer(layer_map: list,
     return standart_x_stdif, standart_y_stdif
 
 
-def init_lavels(player) -> Column:
+def init_lavels(player, bar) -> Column:
     lavels = Column()
     for lavel in os.listdir("./maps"):
         standart_x_stdif, standart_y_stdif = 0, 0
         layers = []
         tiles_types_and_groups = {"0": pygame.sprite.Group(), "1": pygame.sprite.Group()}
+        keys = Keys(tiles_types_and_groups["0"], player, n=Number_of_keys_at_floor)
         for layer in os.listdir(os.path.join("./maps", lavel)):
             layer_map = load_layer_as_list(os.path.join("./maps", lavel, layer))
             if not(standart_x_stdif or standart_y_stdif):
                 standart_x_stdif, standart_y_stdif = load_layer(layer_map, layers,
-                                                                tiles_types_and_groups, player, lavels)
+                                                                tiles_types_and_groups, player, lavels, keys)
             else:
-                load_layer(layer_map, layers, tiles_types_and_groups, player, lavels)
-        newlavel = Lavel(layers, tiles_types_and_groups)
+                load_layer(layer_map, layers, tiles_types_and_groups, player, lavels, keys)
+        bar.change_n(keys.generate_keys())
+        newlavel = Lavel(layers, tiles_types_and_groups, keys)
         newlavel.change_standart_stdif(standart_x_stdif, standart_y_stdif)
         lavels.append(newlavel)
 

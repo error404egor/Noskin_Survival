@@ -1,17 +1,20 @@
 import typing
 from column import Column
 import pygame
-from consts import Tile_side, Player_x, Player_y, Screen_width, Screen_height
+from consts import Tile_side, Player_x, Player_y, Screen_width, Screen_height, Tiles_dict, KeyChar
+from random import sample
 
 
 class Lavel:
     def __init__(self,
                  layers: list[pygame.sprite.Group, ...],
-                 visible_tiles_types_and_groups: {"0": pygame.sprite.Group, "1": pygame.sprite.Group}):
+                 visible_tiles_types_and_groups: {"0": pygame.sprite.Group, "1": pygame.sprite.Group},
+                 keys):
         self.layers = layers  # слои объектов, которые будут последовательно
         # отрисовываться на карте, каждый слой - группа спрайтов
         self.visible_tiles_types_and_groups = visible_tiles_types_and_groups  # определение группы
         # коллизионных спрайтов и бесколизионных спрайтов (создание двух групп для них).
+        self.keys = keys  # присваивание класса ключей
         self.y_stdif = 0
         self.x_stdif = 0
         self.standart_x_stdif = 0
@@ -23,11 +26,13 @@ class Lavel:
         self.y_stdif -= dif_y
         for layer in self.layers:
             layer.update(dif_x, dif_y)  # смещение карты относительно пройденного игроком расстояния
+        self.keys.key_group.update(dif_x, dif_y)
 
     def draw(self,
              screen: pygame.Surface):
         for layer in self.layers:
             layer.draw(screen)  # отрисовка всех слоев карты
+        self.keys.key_group.draw(screen)
 
     def move_to_spawn(self):
         print(self.x_stdif, self.y_stdif)
@@ -181,4 +186,48 @@ class LavelChanger(Tile):
             elif self.direction == "u":
                 self.lavels.get().move_to_spawn()
                 self.lavels.up()
+
+
+class Keys:
+    def __init__(self, uncollidable_group: pygame.sprite.Group, player: Player, n=1):
+        self.key_positions = []
+        self.n = n
+        self.key_group = pygame.sprite.Group()
+        self.key_texture = Tiles_dict[KeyChar]["texture"]
+        self.key_size = Tiles_dict[KeyChar]["size"]
+        self.player = player
+        self.uncollidable_group = uncollidable_group
+
+    def add_position(self, pos: (int, int)):
+        self.key_positions.append(pos)
+
+    def change_number(self, n):
+        self.n = n
+
+    def generate_keys(self):
+        if self.n >= len(self.key_positions):
+            self.n = len(self.key_positions)
+        generating = sample(self.key_positions, self.n)
+        for pos in generating:
+            Key(*pos, self.key_texture, self.key_group, self.uncollidable_group, self.key_size, self.player)
+        return self.n
+
+
+class Key(Tile):
+    def __init__(self,
+                 x, y,
+                 texture,
+                 keys_group: pygame.sprite.Group,
+                 uncollidable_group: pygame.sprite.Group,
+                 size,
+                 player: Player) -> None:
+        super().__init__(x, y, texture, keys_group, uncollidable_group, "0", size)
+        self.player = player
+
+    def update(self, x: int, y: int) -> None:
+        super(Key, self).update(x, y)
+        if pygame.sprite.collide_rect(self, self.player):
+            print("cought")
+            self.kill()
+
 

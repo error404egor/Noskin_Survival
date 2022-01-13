@@ -29,7 +29,8 @@ with open("tiles.csv", "r") as tiles:
                                                                    (int(elem["width"]), int(elem["height"]))),
                                  "size": (int(elem["width"]),
                                           int(elem["height"]))} for elem in Tiles_list}
-
 Tile_side = Tiles_dict[" "]["size"][0]
+KeyChar = "k"
+Number_of_keys_at_floor = 1
 
 Level0 = "map.txt"
