@@ -22,5 +22,8 @@ class Column:
 
     def __str__(self):
         return str(self.__array) + ", " + str(self.__index_now)
+
+    def is_empty(self):
+        return not bool(len(self.__array))
 #  класс для создания списка этажей игры для переключения между ними(по сути обыкновенный переработанный
 #  __list__ с изменениями функционала

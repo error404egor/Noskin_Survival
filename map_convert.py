@@ -78,6 +78,7 @@ def init_lavels(player, enemy) -> Column:
                 load_layer(layer_map, layers, tiles_types_and_groups, player, enemy, lavels)
         lavel_as_list.append(layer_as_list)
         newlavel = Lavel(layers, tiles_types_and_groups, lavel_as_list, enemy)
+        enemy.column.append(newlavel)
         newlavel.change_standart_stdif(standart_x_stdif, standart_y_stdif)
         lavels.append(newlavel)
 
