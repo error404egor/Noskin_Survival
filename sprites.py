@@ -1,13 +1,16 @@
 import typing
+
 from column import Column
 import pygame
-from consts import Tile_side, Player_x, Player_y, Screen_width, Screen_height
+from consts import Tile_side, Player_x, Player_y, Screen_width, Screen_height, typical_layer, enemy_f_x, enemy_f_y
+from boris import rework_map_as_0_1
 
 
 class Lavel:
     def __init__(self,
                  layers: list[pygame.sprite.Group, ...],
-                 visible_tiles_types_and_groups: {"0": pygame.sprite.Group, "1": pygame.sprite.Group}):
+                 visible_tiles_types_and_groups: {"0": pygame.sprite.Group, "1": pygame.sprite.Group},
+                 layers_as_list: list[list, ...], enemy):
         self.layers = layers  # слои объектов, которые будут последовательно
         # отрисовываться на карте, каждый слой - группа спрайтов
         self.visible_tiles_types_and_groups = visible_tiles_types_and_groups  # определение группы
@@ -16,6 +19,8 @@ class Lavel:
         self.x_stdif = 0
         self.standart_x_stdif = 0
         self.standart_y_stdif = 0
+        self.list_layers = layers_as_list
+        self.enemy = enemy
 
     def update(self,
                dif_x: int, dif_y: int):
@@ -23,6 +28,11 @@ class Lavel:
         self.y_stdif -= dif_y
         for layer in self.layers:
             layer.update(dif_x, dif_y)  # смещение карты относительно пройденного игроком расстояния
+        self.enemy.update(dif_x, dif_y)
+        dx = len(typical_layer[0]) // 2
+        dy = len(typical_layer) // 2
+        player_cords = self.player_find_cords(self.x_stdif, self.y_stdif, self.standart_x_stdif,
+                                              self.standart_y_stdif, dx, dy)
 
     def draw(self,
              screen: pygame.Surface):
@@ -30,7 +40,6 @@ class Lavel:
             layer.draw(screen)  # отрисовка всех слоев карты
 
     def move_to_spawn(self):
-        print(self.x_stdif, self.y_stdif)
         self.update(self.x_stdif, self.y_stdif)
         self.update(self.standart_x_stdif, self.standart_y_stdif)
 
@@ -38,6 +47,16 @@ class Lavel:
         self.standart_x_stdif += x
         self.standart_y_stdif += y
         self.update(self.standart_x_stdif, self.standart_y_stdif)
+
+    def player_find_cords(self, x_stdif, y_stdif, x_standart_stdif, y_standart_stdif, x_f, y_f):
+        x_stdif += x_standart_stdif
+        y_stdif += y_standart_stdif
+        x_f_standart = x_f + (x_standart_stdif // Tile_side)
+        y_f_standart = y_f + (y_standart_stdif // Tile_side)
+        y_f_sdif = y_f_standart - (y_stdif // Tile_side)
+        x_f_stdif = x_f_standart - (x_stdif // Tile_side)
+        x_f_stdif, y_f_sdif = y_f_sdif, x_f_stdif
+        return y_f_sdif, x_f_stdif
 
 
 class Tile(pygame.sprite.Sprite):
@@ -156,6 +175,69 @@ class Player(pygame.sprite.Sprite):
         return x_dif, y_dif
 
 
+class Enemy(pygame.sprite.Sprite):
+    def __init__(self, x: int, y: int, speed: int, vision_range: int,
+                 anim: AnimCount, player_group: pygame.sprite.Group) -> None:
+        super().__init__()
+        self.x = enemy_f_x * Tile_side
+        self.y = enemy_f_y * Tile_side
+        self.anim = anim  # объект анимации для врага
+        self.image = self.anim.get_anim()  # запихивание самой первой картинки амогуса в ег self image
+        self.rect = self.image.get_rect()  # создание границ врага
+        width = len(typical_layer[0])
+        height = len(typical_layer)
+        self.rect.x = self.x - (width - Screen_width) // 2
+        self.rect.y = self.y - (height - Screen_height) // 2
+        print(self.rect)
+        self.speed = speed  # скорость врага пиксель/кадр
+        self.vision_range = vision_range  # todo in fact
+        player_group.add(self)  # добавка в группу спрайтов врага
+
+    def update(self, x: int, y: int) -> None:
+        self.rect.x -= x
+        self.rect.y -= y
+
+    def find_path_step(self, level: str, start, target):
+        INF = 1000
+        start, target = target, start
+        x, y = start
+        map_ = rework_map_as_0_1(level)
+        # for elem in map_:
+        #    print(elem)
+        # print('\n')
+        # print('\n')
+        width = len(map_[0])
+        height = len(map_)
+        distance = [[INF] * width for _ in range(height)]
+        distance[y][x] = 0
+        prev = [[None] * width for _ in range(height)]
+        queue = [(x, y)]
+        while queue:
+            x, y = queue.pop(0)
+            for dx, dy in (1, 0), (0, 1), (-1, 0), (0, -1):
+                next_x, next_y = x + dx, y + dy
+                if 0 <= next_x < width and 0 <= next_y < height\
+                        and map_[next_y][next_x] is 0 and distance[next_y][next_x] == INF:
+                    distance[next_y][next_x] = distance[y][x] + 1
+                    prev[next_y][next_x] = (x, y)
+                    queue.append((next_x, next_y))
+        x, y = target
+        # for elem in distance:
+        #    print(elem)
+        # print('\n')
+        # print('\n')
+        if distance[y][x] == INF or start == target:
+            return start
+        while prev[y][x] != start:
+            x, y = prev[y][x]
+        return x, y
+
+    def enemy_find_cords(self, dx=0, dy=0):
+        self.x -= dx
+        self.y -= dy
+        return self.x // Tile_side, self.y // Tile_side
+
+
 class LavelChanger(Tile):
     def __init__(self,
                  x: int, y: int,
@@ -165,10 +247,12 @@ class LavelChanger(Tile):
                  transparency: str,
                  size: tuple,
                  player: Player,
+                 enemy: Enemy,
                  lavels: Column,
                  direction: typing.Union["d", "u"]) -> None:
         super(LavelChanger, self).__init__(x, y, texture, layer_of_tile_group, tile_group, transparency, size)
         self.player = player
+        self.enemy = enemy
         self.lavels = lavels
         self.direction = direction
 
@@ -181,4 +265,3 @@ class LavelChanger(Tile):
             elif self.direction == "u":
                 self.lavels.get().move_to_spawn()
                 self.lavels.up()
-

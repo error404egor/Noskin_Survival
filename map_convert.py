@@ -16,10 +16,10 @@ def load_layer_as_list(file: str) -> list:
 
 def load_layer(layer_map: list,
                layers: list,
-               tiles_types_and_groups: dict, player, column):
-    startpos_x = (Screen_width - len(layer_map[0]) * Tile_side) // 2
-    y_now = (Screen_height - len(layer_map) * Tile_side) // 2
-    group_of_this_layer = pygame.sprite.Group()
+               tiles_types_and_groups: dict, player, enemy, column):
+    startpos_x = (Screen_width - (len(layer_map[0]) * Tile_side)) // 2
+    y_now = (Screen_height - (len(layer_map) * Tile_side)) // 2
+    group_of_this_layer = pygame.sprite.Group()  # ?
     standart_y_stdif = 0
     standart_x_stdif = 0
     for line in layer_map:
@@ -35,11 +35,12 @@ def load_layer(layer_map: list,
                              Tiles_dict[tile]["transparency"],
                              Tiles_dict[tile]["size"],
                              player,
+                             enemy,
                              column,
                              tile)
             elif tile == "s":
-                standart_x_stdif = (x_now + Tile_side // 2) - Player_x
-                standart_y_stdif = (y_now + Tile_side // 2) - Player_y
+                standart_x_stdif = (x_now + (Tile_side // 2)) - Player_x
+                standart_y_stdif = (y_now + (Tile_side // 2)) - Player_y
                 Tile(x_now, y_now,
                      Tiles_dict[tile]["texture"],
                      group_of_this_layer,
@@ -59,20 +60,24 @@ def load_layer(layer_map: list,
     return standart_x_stdif, standart_y_stdif
 
 
-def init_lavels(player) -> Column:
+def init_lavels(player, enemy) -> Column:
     lavels = Column()
+    lavel_as_list = []
     for lavel in os.listdir("./maps"):
         standart_x_stdif, standart_y_stdif = 0, 0
         layers = []
-        tiles_types_and_groups = {"0": pygame.sprite.Group(), "1": pygame.sprite.Group()}
+        layer_as_list = []
+        tiles_types_and_groups = {"0": pygame.sprite.Group(), "1": pygame.sprite.Group()}  # ?
         for layer in os.listdir(os.path.join("./maps", lavel)):
             layer_map = load_layer_as_list(os.path.join("./maps", lavel, layer))
+            layer_as_list.append(layer_map)
             if not(standart_x_stdif or standart_y_stdif):
                 standart_x_stdif, standart_y_stdif = load_layer(layer_map, layers,
-                                                                tiles_types_and_groups, player, lavels)
+                                                                tiles_types_and_groups, player, enemy, lavels)
             else:
-                load_layer(layer_map, layers, tiles_types_and_groups, player, lavels)
-        newlavel = Lavel(layers, tiles_types_and_groups)
+                load_layer(layer_map, layers, tiles_types_and_groups, player, enemy, lavels)
+        lavel_as_list.append(layer_as_list)
+        newlavel = Lavel(layers, tiles_types_and_groups, lavel_as_list, enemy)
         newlavel.change_standart_stdif(standart_x_stdif, standart_y_stdif)
         lavels.append(newlavel)
 

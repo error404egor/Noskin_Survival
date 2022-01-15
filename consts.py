@@ -33,3 +33,19 @@ with open("tiles.csv", "r") as tiles:
 Tile_side = Tiles_dict[" "]["size"][0]
 
 Level0 = "map.txt"
+# kostyl
+
+
+def load_layer_as_list(file: str) -> list:
+    with open(file, "r") as map_:
+        level_map = []
+        for line in map_:
+            line = line.strip()
+            level_map.append(line)
+        return level_map
+
+
+typical_layer = load_layer_as_list('maps/0/0.txt')
+enemy_x = len(typical_layer[0]) * Tile_side - Tile_side * 2
+enemy_y = len(typical_layer) * Tile_side + Tile_side // 2
+enemy_f_x, enemy_f_y = 1, 1
