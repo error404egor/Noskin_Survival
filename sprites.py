@@ -35,7 +35,6 @@ class Lavel:
         self.keys.key_group.draw(screen)
 
     def move_to_spawn(self):
-        print(self.x_stdif, self.y_stdif)
         self.update(self.x_stdif, self.y_stdif)
         self.update(self.standart_x_stdif, self.standart_y_stdif)
 
@@ -189,13 +188,14 @@ class LavelChanger(Tile):
 
 
 class Keys:
-    def __init__(self, uncollidable_group: pygame.sprite.Group, player: Player, n=1):
+    def __init__(self, uncollidable_group: pygame.sprite.Group, player: Player, bar, n=1):
         self.key_positions = []
         self.n = n
         self.key_group = pygame.sprite.Group()
         self.key_texture = Tiles_dict[KeyChar]["texture"]
         self.key_size = Tiles_dict[KeyChar]["size"]
         self.player = player
+        self.bar = bar
         self.uncollidable_group = uncollidable_group
 
     def add_position(self, pos: (int, int)):
@@ -209,7 +209,7 @@ class Keys:
             self.n = len(self.key_positions)
         generating = sample(self.key_positions, self.n)
         for pos in generating:
-            Key(*pos, self.key_texture, self.key_group, self.uncollidable_group, self.key_size, self.player)
+            Key(*pos, self.key_texture, self.key_group, self.uncollidable_group, self.key_size, self.player, self.bar)
         return self.n
 
 
@@ -220,14 +220,36 @@ class Key(Tile):
                  keys_group: pygame.sprite.Group,
                  uncollidable_group: pygame.sprite.Group,
                  size,
-                 player: Player) -> None:
+                 player: Player,
+                 bar) -> None:
         super().__init__(x, y, texture, keys_group, uncollidable_group, "0", size)
         self.player = player
+        self.bar = bar
 
     def update(self, x: int, y: int) -> None:
         super(Key, self).update(x, y)
         if pygame.sprite.collide_rect(self, self.player):
-            print("cought")
+            self.bar.add_to_count()
             self.kill()
 
 
+class Carpet(Tile):
+    def __init__(self,
+                 x: int, y: int,
+                 texture: pygame.Surface,
+                 layer_of_tile_group: pygame.sprite.Group,
+                 tile_group: pygame.sprite.Group,
+                 transparency: str,
+                 size: tuple,
+                 player: Player,
+                 bar) -> None:
+        super(Carpet, self).__init__(x, y, texture, layer_of_tile_group, tile_group, transparency, size)
+        self.player = player
+        self.bar = bar
+
+    def update(self, x: int, y: int) -> None:
+        super(Carpet, self).update(x, y)
+        if pygame.sprite.collide_rect(self, self.player):
+            if pygame.key.get_pressed()[pygame.K_e]:
+                if self.bar.n <= self.bar.count:
+                    self.bar.done = True

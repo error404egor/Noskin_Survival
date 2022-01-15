@@ -4,25 +4,22 @@ from consts import Screen_size, Player_animlength, Player_left_walk, Player_righ
 from map_convert import init_lavels
 from sprites import Player, AnimCount
 from column import Column
-from menuBar import Bar
+from menuBar import Bar, pause, menu
 #  picking keys
 
 
 def draw(screen, lavels: Column, player: Player, bar: Bar):
-    screen.fill(pygame.Color("gray"))
+    screen.fill(pygame.Color("black"))
     dif_x, dif_y = player.update(lavels.get().visible_tiles_types_and_groups["1"])
     lavels.get().update(dif_x, dif_y)
     lavels.get().draw(screen)
-    screen.blit(player.image, player.rect)
+    pygame.draw.circle(screen, pygame.Color("black"), player.rect.center,
+                       Screen_size[0], width=Screen_size[0] - player.vision_range)
     bar.draw(screen)
+    screen.blit(player.image, player.rect)
 
 
-def main():
-    pygame.init()
-    screen = pygame.display.set_mode(Screen_size)
-    pygame.display.set_caption("5 НОЧЕЙ С НОСКИНЫМ")
-    pygame.display.flip()
-
+def game(screen):
     bar = Bar()
 
     clock = pygame.time.Clock()
@@ -41,7 +38,8 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
-
+                pygame.quit()
+                quit()
         keys = pygame.key.get_pressed()
         if keys[pygame.K_1]:
             if not pressed:
@@ -59,13 +57,24 @@ def main():
             if not pressed:
                 player.speed -= 1
                 pressed = True
+        elif keys[pygame.K_ESCAPE]:
+            if pause(screen) == False:
+                return 0
         else:
             pressed = False
 
         draw(screen, lavels, player, bar)
         pygame.display.flip()
+        if bar.done:
+            run = False
 
-    pygame.quit()
+
+def main():
+    pygame.init()
+    screen = pygame.display.set_mode(Screen_size)
+    pygame.display.set_caption("5 НОЧЕЙ С НОСКИНЫМ")
+    pygame.display.flip()
+    menu(screen, game)
 
 
 if __name__ == "__main__":
