@@ -149,7 +149,7 @@ def menu(screen: pygame.Surface, game):
 def over(screen: pygame.Surface, text):
     screen.blit(pygame.transform.scale(pygame.image.load("./textures/menu_screen.jpg"), Screen_size), (0, 0, ))
     green_button = Button((0, 255, 0), 280, 255, 250, 100, "Продолжить")
-    text = Text((255, 255, 255), 280, 300, text)
+    text = Text((255, 255, 255), 340, 255, text)
     run = True
     while run:
         screen.blit(pygame.transform.scale(pygame.image.load("./textures/menu_screen.jpg"), Screen_size), (0, 0, ))

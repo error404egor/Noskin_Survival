@@ -16,7 +16,7 @@ def load_layer_as_list(file: str) -> list:
 
 def load_layer(layer_map: list,
                layers: list,
-               tiles_types_and_groups: dict, player, column, keys):
+               tiles_types_and_groups: dict, player, column, keys, enemy):
     startpos_x = (Screen_width - len(layer_map[0]) * Tile_side) // 2
     y_now = (Screen_height - len(layer_map) * Tile_side) // 2
     print(startpos_x, y_now)
@@ -37,7 +37,8 @@ def load_layer(layer_map: list,
                              Tiles_dict[tile]["size"],
                              player,
                              column,
-                             tile)
+                             tile,
+                             enemy)
             elif tile == "s":
                 standart_x_stdif = (x_now + Tile_side // 2) - Player_x
                 standart_y_stdif = (y_now + Tile_side // 2) - Player_y
@@ -72,8 +73,10 @@ def load_layer(layer_map: list,
     return standart_x_stdif, standart_y_stdif
 
 
-def init_lavels(player, bar) -> Column:
+def init_lavels(player, bar, enemy) -> Column:
     lavels = Column()
+    lavel_as_list = []
+    layer_as_list = []
     for lavel in os.listdir("./maps"):
         standart_x_stdif, standart_y_stdif = 0, 0
         layers = []
@@ -81,13 +84,16 @@ def init_lavels(player, bar) -> Column:
         keys = Keys(tiles_types_and_groups["0"], player, bar, n=Number_of_keys_at_floor)
         for layer in os.listdir(os.path.join("./maps", lavel)):
             layer_map = load_layer_as_list(os.path.join("./maps", lavel, layer))
+            layer_as_list.append(layer_map)
             if not(standart_x_stdif or standart_y_stdif):
                 standart_x_stdif, standart_y_stdif = load_layer(layer_map, layers,
-                                                                tiles_types_and_groups, player, lavels, keys)
+                                                                tiles_types_and_groups, player, lavels, keys, enemy)
             else:
-                load_layer(layer_map, layers, tiles_types_and_groups, player, lavels, keys)
+                load_layer(layer_map, layers, tiles_types_and_groups, player, lavels, keys, enemy)
+        lavel_as_list.append(layer_as_list)
         bar.add_to_n(keys.generate_keys())
-        newlavel = Lavel(layers, tiles_types_and_groups, keys)
+        newlavel = Lavel(layers, tiles_types_and_groups, keys, lavel_as_list, enemy)
+        enemy.column.append(newlavel)
         newlavel.change_standart_stdif(standart_x_stdif, standart_y_stdif)
         lavels.append(newlavel)
 
