@@ -238,7 +238,7 @@ class Enemy(pygame.sprite.Sprite):
     def enemy_find_cords(self, dx=0, dy=0):
         self.x -= dx
         self.y -= dy
-        #print(self.x, self.y, '!!!')
+        print(self.x, self.y, '!!!')
         return self.x // Tile_side, self.y // Tile_side
 
     def where_to_move(self, level_map_t: list,
