@@ -41,7 +41,7 @@ def main():
     pressed = False
 
     while run:
-        clock.tick(60)
+        clock.tick(60)  # ok
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
