@@ -219,7 +219,7 @@ class Enemy(pygame.sprite.Sprite):
             for dx, dy in (1, 0), (0, 1), (-1, 0), (0, -1):
                 next_x, next_y = x + dx, y + dy
                 if 0 <= next_x < width and 0 <= next_y < height\
-                        and map_[next_y][next_x] is 0 and distance[next_y][next_x] == INF:
+                        and map_[next_y][next_x] == 0 and distance[next_y][next_x] == INF:
                     distance[next_y][next_x] = distance[y][x] + 1
                     prev[next_y][next_x] = (x, y)
                     queue.append((next_x, next_y))
