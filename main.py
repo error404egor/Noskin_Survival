@@ -36,7 +36,7 @@ def main():
     enemy = Enemy(enemy_x, enemy_y, Player_speed, Player_vision_range, player_anims, enemy_group)
     lavels = init_lavels(player, enemy)
     dx = len(typical_layer[0]) / 2
-    dy = len(typical_layer) / 2
+    dy = len(typical_layer) / 2  # нюхвй бебру
     run = True
     pressed = False
 
