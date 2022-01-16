@@ -13,8 +13,9 @@ def draw(screen, lavels: Column, player: Player, enemy: Enemy, level_map_t: list
     screen.fill(pygame.Color("gray"))
     dif_x, dif_y = player.update(lavels.get().visible_tiles_types_and_groups["1"])
     cords = enemy.enemy_find_cords(speed_x, speed_y)
-    where_to_go = enemy.find_path_step(level_map_t, player_cords, enemy.enemy_find_cords(speed_x, speed_y))
+    where_to_go = enemy.find_path_step(level_map_t, player_cords, cords)
     speed_x, speed_y = cords[0] - where_to_go[0], cords[1] - where_to_go[1]
+    speed_x, speed_y = speed_x * 5, speed_y * 5
     print(where_to_go, cords, speed_x, speed_y)
     enemy.update(speed_x, speed_y)  # todo
     lavels.get().update(dif_x, dif_y)

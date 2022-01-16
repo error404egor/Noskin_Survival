@@ -181,8 +181,8 @@ class Enemy(pygame.sprite.Sprite):
     def __init__(self, x: int, y: int, speed: int, vision_range: int,
                  anim: AnimCount, player_group: pygame.sprite.Group) -> None:
         super().__init__()
-        self.x = enemy_f_x * Tile_side
-        self.y = enemy_f_y * Tile_side
+        self.x = enemy_f_x * Tile_side - Tile_side // 2
+        self.y = enemy_f_y * Tile_side - Tile_side // 2
         self.anim = anim  # объект анимации для врага
         self.image = self.anim.get_anim()  # запихивание самой первой картинки амогуса в ег self image
         self.rect = self.image.get_rect()  # создание границ врага
@@ -237,6 +237,7 @@ class Enemy(pygame.sprite.Sprite):
     def enemy_find_cords(self, dx=0, dy=0):
         self.x -= dx
         self.y -= dy
+        print(self.x, self.y, '!!!')
         return self.x // Tile_side, self.y // Tile_side
 
 
