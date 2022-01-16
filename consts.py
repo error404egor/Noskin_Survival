@@ -49,3 +49,4 @@ typical_layer = load_layer_as_list('maps/0/0.txt')
 enemy_x = len(typical_layer[0]) * Tile_side - Tile_side * 2
 enemy_y = len(typical_layer) * Tile_side + Tile_side // 2
 enemy_f_x, enemy_f_y = 30, 13
+enemy_speed = 5

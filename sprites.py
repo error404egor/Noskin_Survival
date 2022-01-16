@@ -181,8 +181,8 @@ class Enemy(pygame.sprite.Sprite):
     def __init__(self, x: int, y: int, speed: int, vision_range: int,
                  anim: AnimCount, player_group: pygame.sprite.Group) -> None:
         super().__init__()
-        self.x = enemy_f_x * Tile_side - Tile_side // 2
-        self.y = enemy_f_y * Tile_side - Tile_side // 2
+        self.x = enemy_f_x * Tile_side
+        self.y = enemy_f_y * Tile_side
         self.anim = anim  # объект анимации для врага
         self.image = self.anim.get_anim()  # запихивание самой первой картинки амогуса в ег self image
         self.rect = self.image.get_rect()  # создание границ врага
@@ -190,6 +190,7 @@ class Enemy(pygame.sprite.Sprite):
         height = len(typical_layer)
         self.rect.x = self.x - (width * Tile_side - Screen_width) // 2 + (Tile_side - self.rect.width) // 2
         self.rect.y = self.y - (height * Tile_side - Screen_height) // 2 + (Tile_side - self.rect.height) // 2
+        print(self.rect)
         self.speed = speed  # скорость врага пиксель/кадр
         self.vision_range = vision_range  # todo in fact
         player_group.add(self)  # добавка в группу спрайтов врага
@@ -219,7 +220,7 @@ class Enemy(pygame.sprite.Sprite):
             for dx, dy in (1, 0), (0, 1), (-1, 0), (0, -1):
                 next_x, next_y = x + dx, y + dy
                 if 0 <= next_x < width and 0 <= next_y < height\
-                        and map_[next_y][next_x] == 0 and distance[next_y][next_x] == INF:
+                        and map_[next_y][next_x] is 0 and distance[next_y][next_x] == INF:
                     distance[next_y][next_x] = distance[y][x] + 1
                     prev[next_y][next_x] = (x, y)
                     queue.append((next_x, next_y))
@@ -239,6 +240,17 @@ class Enemy(pygame.sprite.Sprite):
         self.y -= dy
         print(self.x, self.y, '!!!')
         return self.x // Tile_side, self.y // Tile_side
+
+    def where_to_move(self, level_map_t: list,
+         player_cords, enemy_cords, speed_x, speed_y):
+        cords = (enemy_cords[0] - speed_x, enemy_cords[1] - speed_y)
+        where_to_go = self.find_path_step(level_map_t, player_cords, cords)
+        speed_x, speed_y = cords[0] - where_to_go[0], cords[1] - where_to_go[1]
+        speed_x, speed_y = speed_x * 5, speed_y * 5
+        return speed_x, speed_y, cords
+
+    def move_enemy(self, speed_x, speed_y):
+        self.update(speed_x, speed_y)  # todo t (пошел GO_OR_FIND_WAY, AMOUNT_OF_STEPS, STEPS)(щас заработает)
 
 
 class LavelChanger(Tile):
