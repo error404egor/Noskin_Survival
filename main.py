@@ -4,7 +4,7 @@ from consts import Screen_size, Player_animlength, Player_left_walk, Player_righ
 from map_convert import init_lavels
 from sprites import Player, AnimCount
 from column import Column
-from menuBar import Bar, pause, menu
+from menuBar import Bar, pause, menu, lose, win
 #  picking keys
 
 
@@ -66,6 +66,7 @@ def game(screen):
         draw(screen, lavels, player, bar)
         pygame.display.flip()
         if bar.done:
+            win(screen)
             run = False
 
 
