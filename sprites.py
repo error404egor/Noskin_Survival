@@ -28,9 +28,10 @@ class Lavel:
         self.y_stdif -= dif_y
         for layer in self.layers:
             layer.update(dif_x, dif_y)  # смещение карты относительно пройденного игроком расстояния
-        self.enemy.update(dif_x, dif_y)
-        dx = len(typical_layer[0]) // 2
-        dy = len(typical_layer) // 2
+        if self.enemy.column.get() == self:
+            self.enemy.update(dif_x, dif_y)
+        dx = len(typical_layer[0]) / 2
+        dy = len(typical_layer) / 2
         player_cords = self.player_find_cords(self.x_stdif, self.y_stdif, self.standart_x_stdif,
                                               self.standart_y_stdif, dx, dy)
 
@@ -38,25 +39,26 @@ class Lavel:
              screen: pygame.Surface):
         for layer in self.layers:
             layer.draw(screen)  # отрисовка всех слоев карты
+        screen.blit(self.enemy.image, self.enemy.rect)
 
     def move_to_spawn(self):
         self.update(self.x_stdif, self.y_stdif)
-        self.update(self.standart_x_stdif, self.standart_y_stdif)
+        self.x_stdif = 0
+        self.y_stdif = 0
 
     def change_standart_stdif(self, x, y):
-        self.standart_x_stdif += x
-        self.standart_y_stdif += y
-        self.update(self.standart_x_stdif, self.standart_y_stdif)
+        self.standart_x_stdif = x
+        self.standart_y_stdif = y
+        self.update(x, y)
+        self.y_stdif = 0
+        self.x_stdif = 0
 
     def player_find_cords(self, x_stdif, y_stdif, x_standart_stdif, y_standart_stdif, x_f, y_f):
-        x_stdif += x_standart_stdif
-        y_stdif += y_standart_stdif
-        x_f_standart = x_f + (x_standart_stdif // Tile_side)
-        y_f_standart = y_f + (y_standart_stdif // Tile_side)
-        y_f_sdif = y_f_standart - (y_stdif // Tile_side)
-        x_f_stdif = x_f_standart - (x_stdif // Tile_side)
-        x_f_stdif, y_f_sdif = y_f_sdif, x_f_stdif
-        return y_f_sdif, x_f_stdif
+        x_stdif = x_standart_stdif - x_stdif
+        y_stdif = y_standart_stdif - y_stdif
+        x_f_standart = x_f + (x_stdif / Tile_side)
+        y_f_standart = y_f + (y_stdif / Tile_side)
+        return int(x_f_standart), int(y_f_standart)
 
 
 class Tile(pygame.sprite.Sprite):
@@ -186,12 +188,12 @@ class Enemy(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()  # создание границ врага
         width = len(typical_layer[0])
         height = len(typical_layer)
-        self.rect.x = self.x - (width - Screen_width) // 2
-        self.rect.y = self.y - (height - Screen_height) // 2
-        print(self.rect)
+        self.rect.x = self.x - (width * Tile_side - Screen_width) // 2 + (Tile_side - self.rect.width) // 2
+        self.rect.y = self.y - (height * Tile_side - Screen_height) // 2 + (Tile_side - self.rect.height) // 2
         self.speed = speed  # скорость врага пиксель/кадр
         self.vision_range = vision_range  # todo in fact
         player_group.add(self)  # добавка в группу спрайтов врага
+        self.column = Column()
 
     def update(self, x: int, y: int) -> None:
         self.rect.x -= x

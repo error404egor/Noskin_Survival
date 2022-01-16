@@ -16,11 +16,10 @@ def draw(screen, lavels: Column, player: Player, enemy: Enemy, level_map_t: list
     where_to_go = enemy.find_path_step(level_map_t, player_cords, enemy.enemy_find_cords(speed_x, speed_y))
     speed_x, speed_y = cords[0] - where_to_go[0], cords[1] - where_to_go[1]
     print(where_to_go, cords, speed_x, speed_y)
-    enemy.update(dif_x + speed_x, dif_y + speed_y)  # todo
+    enemy.update(speed_x, speed_y)  # todo
     lavels.get().update(dif_x, dif_y)
     lavels.get().draw(screen)
     screen.blit(player.image, player.rect)
-    screen.blit(enemy.image, enemy.rect)
     return speed_x, speed_y
 
 
