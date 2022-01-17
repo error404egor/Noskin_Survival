@@ -1,7 +1,7 @@
 import pygame
 from consts import Screen_size, Player_animlength, Player_left_walk, Player_right_walk, \
     Player_stand, Player_x, Player_y, Player_speed, Player_vision_range,  enemy_x, enemy_y, typical_layer, Tile_side, \
-    enemy_speed, enemy_f_x, enemy_f_y
+    enemy_speed, enemy_f_x, enemy_f_y, error
 from map_convert import init_lavels
 from sprites import Player, AnimCount, Enemy
 from column import Column
@@ -72,31 +72,32 @@ def game(screen):
             pressed = False
 
         draw(screen, lavels, player, bar, enemy)
-        if GO_OR_FIND_WAY:
-            cords = enemy.where_to_move(lavels.get().list_layers,
-                                        lavels.get().player_find_cords(lavels.get().x_stdif,
-                                                                       lavels.get().y_stdif,
-                                                                       lavels.get().standart_x_stdif,
-                                                                       lavels.get().standart_y_stdif, dx, dy),
-                                        ENEMY_CORDS,
-                                        T_ONE_X // enemy_speed, T_ONE_Y // enemy_speed)
-            print(cords)
-            ENEMY_CORDS = cords[2][0], cords[2][1]
-            GO_OR_FIND_WAY = False
-            T_ONE_X, T_ONE_Y = cords[0], cords[1]
-        else:
-            if STEPS != AMOUNT_OF_STEPS:
-                enemy.move_enemy(T_ONE_X, T_ONE_Y)
-                STEPS += 1
+        if enemy.column.get() == lavels.get():
+            if GO_OR_FIND_WAY:
+                cords = enemy.where_to_move(lavels.get().list_layers,
+                                            lavels.get().player_find_cords(lavels.get().x_stdif,
+                                                                           lavels.get().y_stdif,
+                                                                           lavels.get().standart_x_stdif,
+                                                                           lavels.get().standart_y_stdif, dx, dy),
+                                            ENEMY_CORDS,
+                                            T_ONE_X // enemy_speed, T_ONE_Y // enemy_speed)
+                print(cords)
+                ENEMY_CORDS = cords[2][0], cords[2][1]
+                GO_OR_FIND_WAY = False
+                T_ONE_X, T_ONE_Y = cords[0], cords[1]
             else:
-                GO_OR_FIND_WAY = True
-                STEPS = 0
+                if STEPS != AMOUNT_OF_STEPS:
+                    enemy.move_enemy(T_ONE_X, T_ONE_Y)
+                    STEPS += 1
+                else:
+                    GO_OR_FIND_WAY = True
+                    STEPS = 0
+                    if pygame.sprite.collide_rect(enemy, player):
+                        lose(screen)
+                        run = False
         pygame.display.flip()
         if bar.done:
             win(screen)
-            run = False
-        if pygame.sprite.collide_rect(enemy, player):
-            lose(screen)
             run = False
 
 
@@ -109,4 +110,12 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception:
+        pygame.quit()
+        pygame.init()
+        screen = pygame.display.set_mode(400, 200)
+        pygame.display.set_caption("Ошибка")
+        error(screen)
+        pygame.quit()
