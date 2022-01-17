@@ -1,7 +1,7 @@
 import pygame
 from consts import Screen_size, Player_animlength, Player_left_walk, Player_right_walk, \
     Player_stand, Player_x, Player_y, Player_speed, Player_vision_range,  enemy_x, enemy_y, typical_layer, Tile_side, \
-    enemy_speed, enemy_f_x, enemy_f_y, error
+    enemy_speed, enemy_f_x, enemy_f_y, error, enemy_texture
 from map_convert import init_lavels
 from sprites import Player, AnimCount, Enemy
 from column import Column
@@ -33,7 +33,7 @@ def game(screen):
     enemy_group = pygame.sprite.Group()
     player_anims = AnimCount(Player_animlength, Player_left_walk, Player_right_walk, Player_stand)
     player = Player(Player_x, Player_y, Player_speed, Player_vision_range, player_anims, player_group)
-    enemy = Enemy(enemy_x, enemy_y, Player_speed, Player_vision_range, player_anims, enemy_group)
+    enemy = Enemy(enemy_x, enemy_y, Player_speed, Player_vision_range, enemy_texture, enemy_group)
 
     lavels = init_lavels(player, bar, enemy)
     dx = len(typical_layer[0]) / 2

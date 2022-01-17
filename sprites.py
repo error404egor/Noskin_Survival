@@ -179,12 +179,11 @@ class Player(pygame.sprite.Sprite):
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, x: int, y: int, speed: int, vision_range: int,
-                 anim: AnimCount, player_group: pygame.sprite.Group) -> None:
+                 texture, player_group: pygame.sprite.Group) -> None:
         super().__init__()
         self.x = enemy_f_x * Tile_side
         self.y = enemy_f_y * Tile_side
-        self.anim = anim  # объект анимации для врага
-        self.image = self.anim.get_anim()  # запихивание самой первой картинки амогуса в ег self image
+        self.image = texture  # запихивание самой первой картинки амогуса в ег self image
         self.rect = self.image.get_rect()  # создание границ врага
         width = len(typical_layer[0])
         height = len(typical_layer)

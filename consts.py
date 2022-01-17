@@ -81,6 +81,7 @@ try:
     enemy_y = len(typical_layer) * Tile_side + Tile_side // 2
     enemy_f_x, enemy_f_y = 30, 13
     enemy_speed = 5
+    enemy_texture = pygame.transform.scale(pygame.image.load("./textures/bebra.png"), (90, 90))
 except Exception:
     pygame.init()
     screen = pygame.display.set_mode((400, 200))
